@@ -1,0 +1,83 @@
+@import "tailwindcss";
+@source "../../**/*.vue";
+
+@theme {
+  --color-bg: #0b0b0b;
+  --color-text: #e5e5e5;
+  --color-text-secondary: #9ca3af;
+  --color-link: #d4d4d4;
+  --color-link-hover: #ffffff;
+
+  --font-serif: "EB Garamond", serif;
+}
+
+/* Base styles */
+html {
+  font-size: 18px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: "EB Garamond", serif;
+  background-color: #0b0b0b;
+  color: #e5e5e5;
+  line-height: 1.85;
+  letter-spacing: 0.01em;
+}
+
+/* Links */
+a {
+  color: #d4d4d4;
+  text-decoration: none;
+  transition: color 100ms ease, opacity 100ms ease;
+}
+
+a:hover {
+  color: #ffffff;
+}
+
+/* Selection */
+::selection {
+  background-color: rgba(229, 229, 229, 0.15);
+  color: #ffffff;
+}
+
+/* Scrollbar - subtle */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(229, 229, 229, 0.1);
+  border-radius: 2px;
+}
+
+/* Textarea reset for admin */
+textarea {
+  font-family: "EB Garamond", serif;
+  font-size: 1rem;
+  line-height: 1.9;
+}
+
+input {
+  font-family: "EB Garamond", serif;
+  font-size: 1rem;
+}
+
+/* Poem content rendered by Nuxt Content */
+.poem-body p {
+  font-family: "EB Garamond", serif;
+  font-size: 1.0625rem;
+  color: #d4d4d4;
+  line-height: 2;
+  margin-bottom: 1.5em;
+}
+
+.poem-body p:last-child {
+  margin-bottom: 0;
+}
