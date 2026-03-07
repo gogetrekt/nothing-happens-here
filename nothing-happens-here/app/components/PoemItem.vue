@@ -1,14 +1,17 @@
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   title: string
-  slug: string
+  slug?: string
+  id?: string | number
 }>()
+
+const href = computed(() => `/poem/${props.slug || props.id}`)
 </script>
 
 <template>
   <li class="group">
     <NuxtLink
-      :to="`/poem/${slug}`"
+      :to="href"
       class="inline-flex items-center gap-2 text-neutral-200 hover:text-white transition-colors duration-150"
     >
       <span class="font-serif text-lg leading-snug">{{ title }}</span>

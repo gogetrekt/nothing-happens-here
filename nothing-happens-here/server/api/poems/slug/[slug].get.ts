@@ -16,18 +16,26 @@ export default defineEventHandler(async (event) => {
     config.supabaseKey
   )
 
-  const { data: poem, error } = await supabase
+  // Try slug match first
+  const { data: bySlug } = await supabase
     .from('poems')
     .select('*')
     .eq('slug', slug)
-    .single()
+    .maybeSingle()
 
-  if (error || !poem) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Poem not found',
-    })
-  }
+  if (bySlug) return bySlug
 
-  return poem
+  // Fall back to ID lookup (for older links using UUID)
+  const { data: byId } = await supabase
+    .from('poems')
+    .select('*')
+    .eq('id', slug)
+    .maybeSingle()
+
+  if (byId) return byId
+
+  throw createError({
+    statusCode: 404,
+    statusMessage: 'Poem not found',
+  })
 })

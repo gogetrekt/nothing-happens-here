@@ -4,10 +4,9 @@ definePageMeta({
 })
 
 interface Poem {
-  id: number
+  id: string
   title: string
   slug: string
-  year: number
   content: string
   created_at: string
 }
@@ -16,7 +15,7 @@ const { data: poems, refresh } = await useAsyncData<Poem[]>('sanctum-poems', () 
   $fetch('/api/poems')
 )
 
-const deleting = ref<number | null>(null)
+const deleting = ref<string | null>(null)
 
 async function handleDelete(poem: Poem) {
   if (!confirm(`Delete "${poem.title}"?`)) return
@@ -74,13 +73,13 @@ useHead({ title: 'Sanctum — Nothing Happens Here' })
             <div class="flex items-start justify-between gap-4">
               <div>
                 <NuxtLink
-                  :to="`/poem/${poem.slug}`"
+                  :to="`/poem/${poem.slug || poem.id}`"
                   class="text-neutral-200 hover:text-white transition-colors font-serif"
                 >
                   {{ poem.title }}
                 </NuxtLink>
                 <p class="text-neutral-600 text-sm mt-1">
-                  {{ poem.year }}
+                  {{ new Date(poem.created_at).getFullYear() }}
                 </p>
               </div>
               <div class="flex gap-4 shrink-0">

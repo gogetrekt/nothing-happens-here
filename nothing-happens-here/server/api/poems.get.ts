@@ -1,5 +1,14 @@
 import { createClient } from "@supabase/supabase-js"
 
+function slugify(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .trim()
+}
+
 export default defineEventHandler(async () => {
   const config = useRuntimeConfig()
 
@@ -20,5 +29,14 @@ export default defineEventHandler(async () => {
     })
   }
 
-  return data
+  // Backfill missing slugs for existing poems
+  const poems = data || []
+  const needsSlug = poems.filter((p: any) => !p.slug)
+  for (const poem of needsSlug) {
+    const slug = slugify(poem.title)
+    await supabase.from('poems').update({ slug }).eq('id', poem.id)
+    poem.slug = slug
+  }
+
+  return poems
 })

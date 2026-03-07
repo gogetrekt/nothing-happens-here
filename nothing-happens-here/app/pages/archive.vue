@@ -1,9 +1,8 @@
 <script setup lang="ts">
 interface Poem {
-  id: number
+  id: string
   title: string
   slug: string
-  year: number
   content: string
   created_at: string
 }
@@ -13,7 +12,8 @@ const { data: allPoems } = await useFetch<Poem[]>('/api/poems')
 const years = computed(() => {
   const grouped: Record<number, Poem[]> = {}
   for (const poem of (allPoems.value ?? [])) {
-    ;(grouped[poem.year] ??= []).push(poem)
+    const year = new Date(poem.created_at).getFullYear()
+    ;(grouped[year] ??= []).push(poem)
   }
   return Object.entries(grouped)
     .sort(([a], [b]) => Number(b) - Number(a))
@@ -46,6 +46,7 @@ useHead({
               :key="poem.id"
               :title="poem.title"
               :slug="poem.slug"
+              :id="poem.id"
             />
           </ul>
         </section>

@@ -1,9 +1,8 @@
 <script setup lang="ts">
 interface Poem {
-  id: number
+  id: string
   title: string
   slug: string
-  year: number
   content: string
   created_at: string
 }
@@ -25,6 +24,7 @@ defineProps<{
         :key="poem.id"
         :title="poem.title"
         :slug="poem.slug"
+        :id="poem.id"
       />
     </ul>
   </div>

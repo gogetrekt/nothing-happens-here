@@ -1,5 +1,14 @@
 import { createClient } from "@supabase/supabase-js"
 
+function slugify(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .trim()
+}
+
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const body = await readBody(event)
@@ -13,7 +22,8 @@ export default defineEventHandler(async (event) => {
     .from("poems")
     .insert({
       title: body.title,
-      content: body.content
+      content: body.content,
+      slug: slugify(body.title || '')
     })
 
   if (error) {

@@ -1,9 +1,8 @@
 <script setup lang="ts">
 interface Poem {
-  id: number
+  id: string
   title: string
   slug: string
-  year: number
   content: string
   created_at: string
 }
@@ -37,7 +36,7 @@ useHead({
         <ul class="mt-5 space-y-5">
           <li v-for="poem in poems" :key="poem.id" class="group">
             <NuxtLink
-              :to="`/poem/${poem.slug}`"
+              :to="`/poem/${poem.slug || poem.id}`"
               class="inline-flex items-center gap-2 text-neutral-200 hover:text-white transition-colors duration-150"
             >
               <span class="font-serif text-lg leading-snug">{{ poem.title }}</span>
