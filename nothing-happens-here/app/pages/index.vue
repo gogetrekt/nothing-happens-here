@@ -8,7 +8,7 @@ interface Poem {
 }
 
 const { data: poems } = await useAsyncData<Poem[]>('poems', () =>
-  $fetch('/api/poems')
+  $fetch('/api/poems' as string)
 )
 
 useHead({
