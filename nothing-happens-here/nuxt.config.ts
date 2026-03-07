@@ -5,6 +5,10 @@ export default defineNuxtConfig({
 
   modules: ['@nuxt/content'],
 
+  nitro: {
+    preset: "vercel"
+  },
+
   content: {
     build: {
       markdown: {
@@ -34,24 +38,13 @@ export default defineNuxtConfig({
         { name: 'theme-color', content: '#0b0b0b' },
       ],
       link: [
-        {
-          rel: 'preconnect',
-          href: 'https://fonts.googleapis.com',
-        },
-        {
-          rel: 'preconnect',
-          href: 'https://fonts.gstatic.com',
-          crossorigin: '',
-        },
+        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
         {
           rel: 'stylesheet',
           href: 'https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap',
         },
-        {
-          rel: 'icon',
-          type: 'image/x-icon',
-          href: '/favicon.ico?v=1',
-        },
+        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico?v=1' },
       ],
     },
   },
