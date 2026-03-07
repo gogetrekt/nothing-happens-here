@@ -1,0 +1,1 @@
+import{e as o,m as s,f as n,c as r,n as c,o as _}from"./CanTIH46.js";const l=o({__name:"[id]",async setup(i){let e,t;const a=s().params.id;return[e,t]=n(()=>c(`/sanctum/edit/${a}`,{replace:!0})),await e,t(),(p,u)=>(_(),r("div"))}});export{l as default};
