@@ -1,6 +1,7 @@
-import { getPoemBySlug } from '../../../utils/db'
+import { createClient } from '@supabase/supabase-js'
 
 export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig()
   const slug = getRouterParam(event, 'slug') || ''
 
   if (!slug) {
@@ -10,9 +11,18 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const poem = getPoemBySlug(slug)
+  const supabase = createClient(
+    config.supabaseUrl,
+    config.supabaseKey
+  )
 
-  if (!poem) {
+  const { data: poem, error } = await supabase
+    .from('poems')
+    .select('*')
+    .eq('slug', slug)
+    .single()
+
+  if (error || !poem) {
     throw createError({
       statusCode: 404,
       statusMessage: 'Poem not found',

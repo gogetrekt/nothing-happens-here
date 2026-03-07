@@ -9,6 +9,11 @@ export default defineNuxtConfig({
     preset: "vercel"
   },
 
+  runtimeConfig: {
+    supabaseUrl: process.env.SUPABASE_URL,
+    supabaseKey: process.env.SUPABASE_KEY
+  },
+
   content: {
     build: {
       markdown: {

@@ -1,26 +1,40 @@
-import { updatePoem } from '../../utils/db'
+import { createClient } from '@supabase/supabase-js'
 
 export default defineEventHandler(async (event) => {
-  const id = parseInt(getRouterParam(event, 'id') || '0')
+  const config = useRuntimeConfig()
+  const id = getRouterParam(event, 'id') || ''
   const body = await readBody(event)
 
-  if (isNaN(id)) {
+  if (!id) {
     throw createError({
       statusCode: 400,
       statusMessage: 'Invalid poem ID',
     })
   }
 
-  if (!body.title || !body.slug || !body.year || !body.content) {
+  if (!body.title || !body.content) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Title, slug, year, and content are required',
+      statusMessage: 'Title and content are required',
     })
   }
 
-  const poem = updatePoem(id, body.title, body.slug, Number(body.year), body.content)
+  const supabase = createClient(
+    config.supabaseUrl,
+    config.supabaseKey
+  )
 
-  if (!poem) {
+  const { data: poem, error } = await supabase
+    .from('poems')
+    .update({
+      title: body.title,
+      content: body.content
+    })
+    .eq('id', id)
+    .select()
+    .single()
+
+  if (error || !poem) {
     throw createError({
       statusCode: 404,
       statusMessage: 'Poem not found',

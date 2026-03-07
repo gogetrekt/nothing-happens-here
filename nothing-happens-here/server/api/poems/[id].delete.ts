@@ -1,18 +1,27 @@
-import { deletePoem } from '../../utils/db'
+import { createClient } from '@supabase/supabase-js'
 
 export default defineEventHandler(async (event) => {
-  const id = parseInt(getRouterParam(event, 'id') || '0')
+  const config = useRuntimeConfig()
+  const id = getRouterParam(event, 'id') || ''
   
-  if (isNaN(id)) {
+  if (!id) {
     throw createError({
       statusCode: 400,
       statusMessage: 'Invalid poem ID',
     })
   }
   
-  const deleted = deletePoem(id)
+  const supabase = createClient(
+    config.supabaseUrl,
+    config.supabaseKey
+  )
   
-  if (!deleted) {
+  const { error } = await supabase
+    .from('poems')
+    .delete()
+    .eq('id', id)
+  
+  if (error) {
     throw createError({
       statusCode: 404,
       statusMessage: 'Poem not found',
