@@ -20,6 +20,12 @@ const years = computed(() => {
     .map(([year, poems]) => ({ year: Number(year), poems }))
 })
 
+const openYear = ref<number | null>(null)
+
+function toggle(year: number) {
+  openYear.value = openYear.value === year ? null : year
+}
+
 useHead({
   title: 'Archive - Nothing Happens Here',
 })
@@ -35,18 +41,28 @@ useHead({
         <hr class="mt-6 border-t border-neutral-800" />
       </header>
 
-      <div class="mt-12 space-y-14">
+      <div class="mt-12 space-y-0 divide-y divide-neutral-800/50">
         <section v-for="group in years" :key="group.year">
-          <p class="text-sm uppercase tracking-widest text-neutral-500">
-            {{ group.year }}
-          </p>
-          <ul class="mt-5 space-y-5">
-            <PoemItem
-              v-for="poem in group.poems"
-              :key="poem.slug"
-              :title="poem.title"
-              :slug="poem.slug"
-            />
+          <button
+            class="w-full flex items-center gap-2 py-4 text-sm uppercase tracking-widest text-neutral-500 hover:text-neutral-300 transition-colors duration-150 cursor-pointer"
+            @click="toggle(group.year)"
+          >
+            <span class="text-xs">{{ openYear === group.year ? '▾' : '▸' }}</span>
+            <span>{{ group.year }}</span>
+          </button>
+          <ul v-if="openYear === group.year" class="pb-5 space-y-5">
+            <li v-for="poem in group.poems" :key="poem.slug" class="group">
+              <NuxtLink
+                :to="`/poem/${poem.slug}`"
+                class="inline-flex items-center gap-2 text-neutral-200 hover:text-white transition-colors duration-150"
+              >
+                <span class="font-serif text-lg leading-snug">{{ poem.title }}</span>
+                <span
+                  class="text-neutral-500 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-150"
+                  aria-hidden="true"
+                >→</span>
+              </NuxtLink>
+            </li>
           </ul>
         </section>
       </div>
