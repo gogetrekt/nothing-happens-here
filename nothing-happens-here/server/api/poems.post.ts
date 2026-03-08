@@ -1,5 +1,4 @@
-import { promises as fs } from 'fs'
-import { join } from 'path'
+import { put, list } from '@vercel/blob'
 import { buildMarkdown, sanitizeSlug } from '../utils/markdown'
 
 export default defineEventHandler(async (event) => {
@@ -15,17 +14,19 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Invalid slug' })
   }
 
-  const filePath = join(process.cwd(), 'content', 'poems', `${safeSlug}.md`)
-
-  try {
-    await fs.access(filePath)
+  const { blobs } = await list({ prefix: `poems/${safeSlug}.md` })
+  if (blobs.some(b => b.pathname === `poems/${safeSlug}.md`)) {
     throw createError({ statusCode: 409, statusMessage: 'A poem with this slug already exists' })
-  } catch (err: any) {
-    if (err.statusCode === 409) throw err
   }
 
   const poemYear = Number(year) || new Date().getFullYear()
-  await fs.writeFile(filePath, buildMarkdown(title.trim(), safeSlug, poemYear, Boolean(draft), content), 'utf-8')
+  const markdown = buildMarkdown(title.trim(), safeSlug, poemYear, Boolean(draft), content)
+
+  await put(`poems/${safeSlug}.md`, markdown, {
+    access: 'public',
+    contentType: 'text/plain; charset=utf-8',
+    addRandomSuffix: false,
+  })
 
   return { ok: true, slug: safeSlug }
 })

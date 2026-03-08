@@ -1,5 +1,4 @@
-import { promises as fs } from 'fs'
-import { join } from 'path'
+import { list } from '@vercel/blob'
 import { parseFrontmatter } from '../../utils/markdown'
 
 export default defineEventHandler(async (event) => {
@@ -9,16 +8,20 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Invalid slug' })
   }
 
-  const filePath = join(process.cwd(), 'content', 'poems', `${slug}.md`)
+  const { blobs } = await list({ prefix: `poems/${slug}.md` })
+  const blob = blobs.find(b => b.pathname === `poems/${slug}.md`)
 
-  let raw: string
-  try {
-    raw = await fs.readFile(filePath, 'utf-8')
-  } catch {
+  if (!blob) {
     throw createError({ statusCode: 404, statusMessage: 'Poem not found' })
   }
 
-  const { frontmatter, body } = parseFrontmatter(raw)
+  const res = await fetch(blob.url)
+  if (!res.ok) {
+    throw createError({ statusCode: 500, statusMessage: 'Failed to fetch poem content' })
+  }
+
+  const text = await res.text()
+  const { frontmatter, body } = parseFrontmatter(text)
 
   return {
     slug: frontmatter.slug || slug,

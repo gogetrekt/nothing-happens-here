@@ -1,5 +1,4 @@
-import { promises as fs } from 'fs'
-import { join } from 'path'
+import { list, del } from '@vercel/blob'
 
 export default defineEventHandler(async (event) => {
   const slug = getRouterParam(event, 'id') || ''
@@ -8,12 +7,14 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Invalid slug' })
   }
 
-  const filePath = join(process.cwd(), 'content', 'poems', `${slug}.md`)
+  const { blobs } = await list({ prefix: `poems/${slug}.md` })
+  const blob = blobs.find(b => b.pathname === `poems/${slug}.md`)
 
-  try {
-    await fs.unlink(filePath)
-    return { success: true }
-  } catch {
+  if (!blob) {
     throw createError({ statusCode: 404, statusMessage: 'Poem not found' })
   }
+
+  await del(blob.url)
+
+  return { success: true }
 })

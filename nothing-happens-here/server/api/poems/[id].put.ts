@@ -1,5 +1,4 @@
-import { promises as fs } from 'fs'
-import { join } from 'path'
+import { put, list } from '@vercel/blob'
 import { buildMarkdown } from '../../utils/markdown'
 
 export default defineEventHandler(async (event) => {
@@ -16,16 +15,20 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Title is required' })
   }
 
-  const filePath = join(process.cwd(), 'content', 'poems', `${slug}.md`)
-
-  try {
-    await fs.access(filePath)
-  } catch {
+  const { blobs } = await list({ prefix: `poems/${slug}.md` })
+  if (!blobs.some(b => b.pathname === `poems/${slug}.md`)) {
     throw createError({ statusCode: 404, statusMessage: 'Poem not found' })
   }
 
   const poemYear = Number(year) || new Date().getFullYear()
-  await fs.writeFile(filePath, buildMarkdown(title.trim(), slug, poemYear, Boolean(draft), content), 'utf-8')
+  const markdown = buildMarkdown(title.trim(), slug, poemYear, Boolean(draft), content)
+
+  await put(`poems/${slug}.md`, markdown, {
+    access: 'public',
+    contentType: 'text/plain; charset=utf-8',
+    addRandomSuffix: false,
+    allowOverwrite: true,
+  })
 
   return { ok: true, slug }
 })

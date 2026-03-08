@@ -1,32 +1,36 @@
-import { promises as fs } from 'fs'
-import { join } from 'path'
+import { list } from '@vercel/blob'
 import { parseFrontmatter } from '../utils/markdown'
 
 export default defineEventHandler(async () => {
-  const dir = join(process.cwd(), 'content', 'poems')
+  const { blobs } = await list({ prefix: 'poems/' })
 
-  let files: string[]
-  try {
-    files = await fs.readdir(dir)
-  } catch {
-    return []
-  }
+  const mdBlobs = blobs.filter(b => b.pathname.endsWith('.md'))
 
-  const poems = []
-  for (const file of files.filter(f => f.endsWith('.md'))) {
-    const raw = await fs.readFile(join(dir, file), 'utf-8')
-    const { frontmatter, body } = parseFrontmatter(raw)
-    const yearFromDate = frontmatter.date
-      ? new Date(frontmatter.date).getFullYear()
-      : new Date().getFullYear()
-    poems.push({
-      slug: frontmatter.slug || file.replace('.md', ''),
-      title: frontmatter.title || '',
-      year: frontmatter.year ?? yearFromDate,
-      draft: frontmatter.draft ?? false,
-      content: body,
+  const poems = await Promise.all(
+    mdBlobs.map(async (blob) => {
+      try {
+        const res = await fetch(blob.url)
+        const text = await res.text()
+        const { frontmatter, body } = parseFrontmatter(text)
+        const slug = blob.pathname.replace('poems/', '').replace('.md', '')
+        const yearFromDate = frontmatter.date
+          ? new Date(frontmatter.date).getFullYear()
+          : new Date().getFullYear()
+        return {
+          slug: frontmatter.slug || slug,
+          title: frontmatter.title || '',
+          year: frontmatter.year ?? yearFromDate,
+          draft: frontmatter.draft ?? false,
+          content: body,
+        }
+      } catch (err) {
+        console.error(`[poems.get] Failed to fetch blob ${blob.pathname}:`, err)
+        return null
+      }
     })
-  }
+  )
 
-  return poems.sort((a, b) => b.year - a.year)
+  return poems
+    .filter((p): p is NonNullable<typeof p> => p !== null)
+    .sort((a, b) => b.year - a.year)
 })
