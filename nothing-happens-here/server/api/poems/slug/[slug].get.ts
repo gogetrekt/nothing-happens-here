@@ -1,6 +1,9 @@
 import { list } from '@vercel/blob'
 import { parseFrontmatter } from '../../../utils/markdown'
 
+const fetchBlob = (url: string) =>
+  fetch(url, { headers: { authorization: `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}` } })
+
 export default defineEventHandler(async (event) => {
   const slug = getRouterParam(event, 'slug') || ''
 
@@ -15,7 +18,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: 'Poem not found' })
   }
 
-  const res = await fetch(blob.url)
+  const res = await fetchBlob(blob.url)
   if (!res.ok) {
     throw createError({ statusCode: 500, statusMessage: 'Failed to fetch poem content' })
   }

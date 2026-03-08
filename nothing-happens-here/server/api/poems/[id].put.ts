@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
   const markdown = buildMarkdown(title.trim(), slug, poemYear, Boolean(draft), content)
 
   await put(`poems/${slug}.md`, markdown, {
-    access: 'public',
+    access: 'private',
     contentType: 'text/plain; charset=utf-8',
     addRandomSuffix: false,
     allowOverwrite: true,

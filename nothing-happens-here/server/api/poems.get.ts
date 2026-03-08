@@ -1,6 +1,9 @@
 import { list } from '@vercel/blob'
 import { parseFrontmatter } from '../utils/markdown'
 
+const fetchBlob = (url: string) =>
+  fetch(url, { headers: { authorization: `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}` } })
+
 export default defineEventHandler(async () => {
   const { blobs } = await list({ prefix: 'poems/' })
 
@@ -9,7 +12,7 @@ export default defineEventHandler(async () => {
   const poems = await Promise.all(
     mdBlobs.map(async (blob) => {
       try {
-        const res = await fetch(blob.url)
+        const res = await fetchBlob(blob.url)
         const text = await res.text()
         const { frontmatter, body } = parseFrontmatter(text)
         const slug = blob.pathname.replace('poems/', '').replace('.md', '')
