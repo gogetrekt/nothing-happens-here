@@ -1,11 +1,10 @@
 <script setup lang="ts">
 const props = defineProps<{
   title: string
-  slug?: string
-  id?: string | number
+  slug: string
 }>()
 
-const href = computed(() => `/poem/${props.slug || props.id}`)
+const href = computed(() => `/poem/${props.slug}`)
 </script>
 
 <template>

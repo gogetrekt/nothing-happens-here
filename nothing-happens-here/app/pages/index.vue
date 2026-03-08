@@ -35,7 +35,7 @@ useHead({
           latest
         </p>
         <ul class="mt-5 space-y-5">
-          <li v-for="poem in poems?.slice(0, 5)" :key="poem.slug" class="group">
+          <li v-for="poem in poems?.filter(p => !p.draft).slice(0, 5)" :key="poem.slug" class="group">
             <NuxtLink
               :to="`/poem/${poem.slug}`"
               class="inline-flex items-center gap-2 text-neutral-200 hover:text-white transition-colors duration-150"

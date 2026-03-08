@@ -3,15 +3,13 @@ const route = useRoute()
 const slug = route.params.slug as string
 
 interface Poem {
-  id: number
-  title: string
   slug: string
+  title: string
   year: number
   content: string
-  created_at: string
 }
 
-const { data: poem } = await useFetch<Poem>(`/api/poems/slug/${slug}`)
+const { data: poem } = await useFetch<Poem>(`/api/poems/${slug}`)
 
 useHead({
   title: () => poem.value ? `${poem.value.title} — Nothing Happens Here` : 'Not Found',

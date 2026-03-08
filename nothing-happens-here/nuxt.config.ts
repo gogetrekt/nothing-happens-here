@@ -3,23 +3,11 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: false },
 
-  modules: ['@nuxt/content'],
-
   nitro: {
     preset: "vercel"
   },
 
   runtimeConfig: {
-  },
-
-  content: {
-    build: {
-      markdown: {
-        remarkPlugins: {
-          'remark-breaks': {},
-        },
-      },
-    },
   },
 
   css: ['~/assets/css/main.css'],

@@ -69,15 +69,6 @@ input {
   font-size: 1rem;
 }
 
-/* Poem content rendered by Nuxt Content */
-.poem-body p {
-  font-family: "EB Garamond", serif;
-  font-size: 1.0625rem;
-  color: #d4d4d4;
-  line-height: 2;
-  margin-bottom: 1.5em;
-}
-
 .poem-body p:last-child {
   margin-bottom: 0;
 }
