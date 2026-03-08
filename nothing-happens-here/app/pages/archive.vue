@@ -21,9 +21,13 @@ const years = computed(() => {
 })
 
 const openYear = ref<number | null>(null)
+const sectionRefs = ref<Record<number, HTMLElement | null>>({})
 
 function toggle(year: number) {
   openYear.value = openYear.value === year ? null : year
+  nextTick(() => {
+    sectionRefs.value[year]?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  })
 }
 
 useHead({
@@ -42,13 +46,13 @@ useHead({
       </header>
 
       <div class="mt-12 space-y-0 divide-y divide-neutral-800/50">
-        <section v-for="group in years" :key="group.year">
+        <section v-for="group in years" :key="group.year" :ref="el => sectionRefs[group.year] = el as HTMLElement | null">
           <button
-            class="w-full flex items-center gap-2 py-4 text-sm uppercase tracking-widest text-neutral-500 hover:text-neutral-300 transition-colors duration-150 cursor-pointer"
+            class="w-full flex items-center justify-between py-4 text-sm uppercase tracking-widest text-neutral-500 hover:text-neutral-300 transition-colors duration-150 cursor-pointer"
             @click="toggle(group.year)"
           >
-            <span class="text-xs">{{ openYear === group.year ? '▾' : '▸' }}</span>
             <span>{{ group.year }}</span>
+            <span class="text-xs">{{ openYear === group.year ? '▾' : '▸' }}</span>
           </button>
           <ul v-if="openYear === group.year" class="pb-5 space-y-5">
             <li v-for="poem in group.poems" :key="poem.slug" class="group">
