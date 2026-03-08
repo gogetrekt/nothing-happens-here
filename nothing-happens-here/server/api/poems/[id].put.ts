@@ -1,55 +1,31 @@
-import { createClient } from '@supabase/supabase-js'
-
-function slugify(title: string): string {
-  return title
-    .toLowerCase()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .trim()
-}
+import { promises as fs } from 'fs'
+import { join } from 'path'
+import { buildMarkdown } from '../../utils/markdown'
 
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig()
-  const id = getRouterParam(event, 'id') || ''
+  const slug = getRouterParam(event, 'id') || ''
   const body = await readBody(event)
 
-  if (!id) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Invalid poem ID',
-    })
+  if (!slug || !/^[a-z0-9-]+$/.test(slug)) {
+    throw createError({ statusCode: 400, statusMessage: 'Invalid slug' })
   }
 
-  if (!body.title || !body.content) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Title and content are required',
-    })
+  const { title, year, draft = false, content = '' } = body
+
+  if (!title?.trim()) {
+    throw createError({ statusCode: 400, statusMessage: 'Title is required' })
   }
 
-  const supabase = createClient(
-    config.supabaseUrl,
-    config.supabaseKey
-  )
+  const filePath = join(process.cwd(), 'content', 'poems', `${slug}.md`)
 
-  const { data: poem, error } = await supabase
-    .from('poems')
-    .update({
-      title: body.title,
-      content: body.content,
-      slug: slugify(body.title)
-    })
-    .eq('id', id)
-    .select()
-    .single()
-
-  if (error || !poem) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Poem not found',
-    })
+  try {
+    await fs.access(filePath)
+  } catch {
+    throw createError({ statusCode: 404, statusMessage: 'Poem not found' })
   }
 
-  return poem
+  const poemYear = Number(year) || new Date().getFullYear()
+  await fs.writeFile(filePath, buildMarkdown(title.trim(), slug, poemYear, Boolean(draft), content), 'utf-8')
+
+  return { ok: true, slug }
 })

@@ -1,37 +1,31 @@
-import { createClient } from "@supabase/supabase-js"
-
-function slugify(title: string): string {
-  return title
-    .toLowerCase()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .trim()
-}
+import { promises as fs } from 'fs'
+import { join } from 'path'
+import { buildMarkdown, sanitizeSlug } from '../utils/markdown'
 
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig()
   const body = await readBody(event)
+  const { title, slug, year, draft = false, content = '' } = body
 
-  const supabase = createClient(
-    config.supabaseUrl,
-    config.supabaseKey
-  )
-
-  const { error } = await supabase
-    .from("poems")
-    .insert({
-      title: body.title,
-      content: body.content,
-      slug: slugify(body.title || '')
-    })
-
-  if (error) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: error.message
-    })
+  if (!title?.trim() || !slug?.trim()) {
+    throw createError({ statusCode: 400, statusMessage: 'Title and slug are required' })
   }
 
-  return { ok: true }
+  const safeSlug = sanitizeSlug(slug)
+  if (!safeSlug) {
+    throw createError({ statusCode: 400, statusMessage: 'Invalid slug' })
+  }
+
+  const filePath = join(process.cwd(), 'content', 'poems', `${safeSlug}.md`)
+
+  try {
+    await fs.access(filePath)
+    throw createError({ statusCode: 409, statusMessage: 'A poem with this slug already exists' })
+  } catch (err: any) {
+    if (err.statusCode === 409) throw err
+  }
+
+  const poemYear = Number(year) || new Date().getFullYear()
+  await fs.writeFile(filePath, buildMarkdown(title.trim(), safeSlug, poemYear, Boolean(draft), content), 'utf-8')
+
+  return { ok: true, slug: safeSlug }
 })

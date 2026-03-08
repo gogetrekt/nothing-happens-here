@@ -4,24 +4,25 @@ definePageMeta({
 })
 
 interface Poem {
-  id: string
-  title: string
   slug: string
+  title: string
+  year: number
+  draft: boolean
   content: string
-  created_at: string
 }
 
-const { data: poems, refresh } = await useAsyncData<Poem[]>('sanctum-poems', () =>
-  $fetch('/api/poems')
-)
+const { data: poems, refresh } = await useAsyncData('sanctum-poems', async () => {
+  const result = await $fetch<Poem[]>('/api/poems')
+  return result
+})
 
 const deleting = ref<string | null>(null)
 
 async function handleDelete(poem: Poem) {
   if (!confirm(`Delete "${poem.title}"?`)) return
-  deleting.value = poem.id
+  deleting.value = poem.slug
   try {
-    await $fetch(`/api/poems/${poem.id}`, { method: 'DELETE' })
+    await $fetch(`/api/poems/${poem.slug}`, { method: 'DELETE' })
     await refresh()
   } catch (err) {
     console.error('Delete failed:', err)
@@ -67,34 +68,34 @@ useHead({ title: 'Sanctum — Nothing Happens Here' })
         <ul v-else class="space-y-4">
           <li
             v-for="poem in poems"
-            :key="poem.id"
+            :key="poem.slug"
             class="border-b border-neutral-900 pb-4"
           >
             <div class="flex items-start justify-between gap-4">
               <div>
                 <NuxtLink
-                  :to="`/poem/${poem.slug || poem.id}`"
+                  :to="`/poem/${poem.slug}`"
                   class="text-neutral-200 hover:text-white transition-colors font-serif"
                 >
                   {{ poem.title }}
                 </NuxtLink>
                 <p class="text-neutral-600 text-sm mt-1">
-                  {{ new Date(poem.created_at).getFullYear() }}
+                  {{ poem.year }}{{ poem.draft ? ' · draft' : '' }}
                 </p>
               </div>
               <div class="flex gap-4 shrink-0">
                 <NuxtLink
-                  :to="`/sanctum/edit/${poem.id}`"
+                  :to="`/sanctum/edit/${poem.slug}`"
                   class="text-sm text-neutral-400 hover:text-white tracking-wider lowercase transition-colors"
                 >
                   edit
                 </NuxtLink>
                 <button
-                  :disabled="deleting === poem.id"
+                  :disabled="deleting === poem.slug"
                   class="text-sm text-neutral-400 hover:text-red-400 tracking-wider lowercase transition-colors disabled:opacity-40"
                   @click="handleDelete(poem)"
                 >
-                  {{ deleting === poem.id ? '...' : 'delete' }}
+                  {{ deleting === poem.slug ? '...' : 'delete' }}
                 </button>
               </div>
             </div>

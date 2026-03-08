@@ -1,33 +1,30 @@
-import { createClient } from '@supabase/supabase-js'
+import { promises as fs } from 'fs'
+import { join } from 'path'
+import { parseFrontmatter } from '../../utils/markdown'
 
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig()
-  const id = getRouterParam(event, 'id') || ''
-  
-  if (!id) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Invalid poem ID',
-    })
+  const slug = getRouterParam(event, 'id') || ''
+
+  if (!slug || !/^[a-z0-9-]+$/.test(slug)) {
+    throw createError({ statusCode: 400, statusMessage: 'Invalid slug' })
   }
-  
-  const supabase = createClient(
-    config.supabaseUrl,
-    config.supabaseKey
-  )
-  
-  const { data: poem, error } = await supabase
-    .from('poems')
-    .select('*')
-    .eq('id', id)
-    .single()
-  
-  if (error || !poem) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Poem not found',
-    })
+
+  const filePath = join(process.cwd(), 'content', 'poems', `${slug}.md`)
+
+  let raw: string
+  try {
+    raw = await fs.readFile(filePath, 'utf-8')
+  } catch {
+    throw createError({ statusCode: 404, statusMessage: 'Poem not found' })
   }
-  
-  return poem
+
+  const { frontmatter, body } = parseFrontmatter(raw)
+
+  return {
+    slug: frontmatter.slug || slug,
+    title: frontmatter.title || '',
+    year: frontmatter.year ?? new Date().getFullYear(),
+    draft: frontmatter.draft ?? false,
+    content: body,
+  }
 })

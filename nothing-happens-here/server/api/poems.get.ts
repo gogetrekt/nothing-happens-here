@@ -1,42 +1,32 @@
-import { createClient } from "@supabase/supabase-js"
-
-function slugify(title: string): string {
-  return title
-    .toLowerCase()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .trim()
-}
+import { promises as fs } from 'fs'
+import { join } from 'path'
+import { parseFrontmatter } from '../utils/markdown'
 
 export default defineEventHandler(async () => {
-  const config = useRuntimeConfig()
+  const dir = join(process.cwd(), 'content', 'poems')
 
-  const supabase = createClient(
-    config.supabaseUrl,
-    config.supabaseKey
-  )
+  let files: string[]
+  try {
+    files = await fs.readdir(dir)
+  } catch {
+    return []
+  }
 
-  const { data, error } = await supabase
-    .from("poems")
-    .select("*")
-    .order("created_at", { ascending: false })
-
-  if (error) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: error.message
+  const poems = []
+  for (const file of files.filter(f => f.endsWith('.md'))) {
+    const raw = await fs.readFile(join(dir, file), 'utf-8')
+    const { frontmatter, body } = parseFrontmatter(raw)
+    const yearFromDate = frontmatter.date
+      ? new Date(frontmatter.date).getFullYear()
+      : new Date().getFullYear()
+    poems.push({
+      slug: frontmatter.slug || file.replace('.md', ''),
+      title: frontmatter.title || '',
+      year: frontmatter.year ?? yearFromDate,
+      draft: frontmatter.draft ?? false,
+      content: body,
     })
   }
 
-  // Backfill missing slugs for existing poems
-  const poems = data || []
-  const needsSlug = poems.filter((p: any) => !p.slug)
-  for (const poem of needsSlug) {
-    const slug = slugify(poem.title)
-    await supabase.from('poems').update({ slug }).eq('id', poem.id)
-    poem.slug = slug
-  }
-
-  return poems
+  return poems.sort((a, b) => b.year - a.year)
 })

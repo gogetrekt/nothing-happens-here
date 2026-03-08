@@ -4,26 +4,32 @@ definePageMeta({
 })
 
 const route = useRoute()
-const id = route.params.id as string
+const slug = route.params.id as string
 
 interface Poem {
-  id: string
-  title: string
   slug: string
+  title: string
+  year: number
+  draft: boolean
   content: string
-  created_at: string
 }
 
-const { data: poem } = await useFetch<Poem>(`/api/poems/${id}`)
+const { data: poem } = await useFetch<Poem>(`/api/poems/${slug}`)
 
 const form = reactive({
   title: '',
+  slug: '',
+  year: new Date().getFullYear(),
+  draft: false,
   content: '',
 })
 
 watch(poem, (newPoem) => {
   if (newPoem) {
     form.title = newPoem.title
+    form.slug = newPoem.slug
+    form.year = newPoem.year
+    form.draft = newPoem.draft
     form.content = newPoem.content
   }
 }, { immediate: true })
@@ -32,8 +38,8 @@ const isSaving = ref(false)
 const error = ref('')
 
 async function handleSave() {
-  if (!form.title.trim() || !form.content.trim()) {
-    error.value = 'Title and content are required'
+  if (!form.title.trim()) {
+    error.value = 'Title is required'
     return
   }
 
@@ -41,16 +47,18 @@ async function handleSave() {
   error.value = ''
 
   try {
-    await $fetch(`/api/poems/${id}`, {
+    await $fetch(`/api/poems/${slug}`, {
       method: 'PUT',
       body: {
         title: form.title,
+        year: form.year,
+        draft: form.draft,
         content: form.content,
       },
     })
     await navigateTo('/sanctum')
-  } catch (err) {
-    error.value = 'Failed to save poem'
+  } catch (err: any) {
+    error.value = err?.data?.statusMessage || 'Failed to save poem'
     console.error('Save error:', err)
   } finally {
     isSaving.value = false
@@ -83,6 +91,44 @@ useHead({
               type="text"
               class="w-full bg-transparent border border-neutral-700 text-neutral-200 px-4 py-3 font-serif text-lg outline-none focus:border-neutral-500 transition-colors"
             />
+          </div>
+
+          <div>
+            <label class="block text-sm uppercase tracking-widest text-neutral-500 mb-3">
+              Slug
+            </label>
+            <input
+              v-model="form.slug"
+              type="text"
+              disabled
+              class="w-full bg-transparent border border-neutral-800 text-neutral-600 px-4 py-3 font-mono text-sm outline-none cursor-not-allowed"
+            />
+          </div>
+
+          <div class="flex gap-6">
+            <div class="flex-1">
+              <label class="block text-sm uppercase tracking-widest text-neutral-500 mb-3">
+                Year
+              </label>
+              <input
+                v-model.number="form.year"
+                type="number"
+                min="1900"
+                max="2100"
+                class="w-full bg-transparent border border-neutral-700 text-neutral-200 px-4 py-3 outline-none focus:border-neutral-500 transition-colors"
+              />
+            </div>
+            <div class="flex items-end pb-3 gap-2">
+              <input
+                id="draft-edit"
+                v-model="form.draft"
+                type="checkbox"
+                class="accent-neutral-400"
+              />
+              <label for="draft-edit" class="text-sm uppercase tracking-widest text-neutral-500 cursor-pointer">
+                Draft
+              </label>
+            </div>
           </div>
 
           <div>

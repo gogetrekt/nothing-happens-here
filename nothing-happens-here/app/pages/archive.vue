@@ -1,10 +1,9 @@
 <script setup lang="ts">
 interface Poem {
-  id: string
-  title: string
   slug: string
-  content: string
-  created_at: string
+  title: string
+  year: number
+  draft: boolean
 }
 
 const { data: allPoems } = await useFetch<Poem[]>('/api/poems')
@@ -12,7 +11,8 @@ const { data: allPoems } = await useFetch<Poem[]>('/api/poems')
 const years = computed(() => {
   const grouped: Record<number, Poem[]> = {}
   for (const poem of (allPoems.value ?? [])) {
-    const year = new Date(poem.created_at).getFullYear()
+    if (poem.draft) continue
+    const year = poem.year
     ;(grouped[year] ??= []).push(poem)
   }
   return Object.entries(grouped)
@@ -43,10 +43,9 @@ useHead({
           <ul class="mt-5 space-y-5">
             <PoemItem
               v-for="poem in group.poems"
-              :key="poem.id"
+              :key="poem.slug"
               :title="poem.title"
               :slug="poem.slug"
-              :id="poem.id"
             />
           </ul>
         </section>

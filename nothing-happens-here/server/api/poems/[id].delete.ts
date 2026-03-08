@@ -1,32 +1,19 @@
-import { createClient } from '@supabase/supabase-js'
+import { promises as fs } from 'fs'
+import { join } from 'path'
 
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig()
-  const id = getRouterParam(event, 'id') || ''
-  
-  if (!id) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Invalid poem ID',
-    })
+  const slug = getRouterParam(event, 'id') || ''
+
+  if (!slug || !/^[a-z0-9-]+$/.test(slug)) {
+    throw createError({ statusCode: 400, statusMessage: 'Invalid slug' })
   }
-  
-  const supabase = createClient(
-    config.supabaseUrl,
-    config.supabaseKey
-  )
-  
-  const { error } = await supabase
-    .from('poems')
-    .delete()
-    .eq('id', id)
-  
-  if (error) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Poem not found',
-    })
+
+  const filePath = join(process.cwd(), 'content', 'poems', `${slug}.md`)
+
+  try {
+    await fs.unlink(filePath)
+    return { success: true }
+  } catch {
+    throw createError({ statusCode: 404, statusMessage: 'Poem not found' })
   }
-  
-  return { success: true }
 })

@@ -1,41 +1,30 @@
-import { createClient } from '@supabase/supabase-js'
+import { promises as fs } from 'fs'
+import { join } from 'path'
+import { parseFrontmatter } from '../../../utils/markdown'
 
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig()
   const slug = getRouterParam(event, 'slug') || ''
 
-  if (!slug) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Invalid poem slug',
-    })
+  if (!slug || !/^[a-z0-9-]+$/.test(slug)) {
+    throw createError({ statusCode: 400, statusMessage: 'Invalid slug' })
   }
 
-  const supabase = createClient(
-    config.supabaseUrl,
-    config.supabaseKey
-  )
+  const filePath = join(process.cwd(), 'content', 'poems', `${slug}.md`)
 
-  // Try slug match first
-  const { data: bySlug } = await supabase
-    .from('poems')
-    .select('*')
-    .eq('slug', slug)
-    .maybeSingle()
+  let raw: string
+  try {
+    raw = await fs.readFile(filePath, 'utf-8')
+  } catch {
+    throw createError({ statusCode: 404, statusMessage: 'Poem not found' })
+  }
 
-  if (bySlug) return bySlug
+  const { frontmatter, body } = parseFrontmatter(raw)
 
-  // Fall back to ID lookup (for older links using UUID)
-  const { data: byId } = await supabase
-    .from('poems')
-    .select('*')
-    .eq('id', slug)
-    .maybeSingle()
-
-  if (byId) return byId
-
-  throw createError({
-    statusCode: 404,
-    statusMessage: 'Poem not found',
-  })
+  return {
+    slug: frontmatter.slug || slug,
+    title: frontmatter.title || '',
+    year: frontmatter.year ?? new Date().getFullYear(),
+    draft: frontmatter.draft ?? false,
+    content: body,
+  }
 })
