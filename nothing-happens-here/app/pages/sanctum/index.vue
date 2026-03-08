@@ -36,7 +36,7 @@ function handleLogout() {
   navigateTo('/')
 }
 
-useHead({ title: 'Sanctum — Nothing Happens Here' })
+useHead({ title: 'Sanctum - Nothing Happens Here' })
 </script>
 
 <template>

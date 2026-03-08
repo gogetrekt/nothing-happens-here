@@ -21,7 +21,7 @@ const years = computed(() => {
 })
 
 useHead({
-  title: 'Archive — Nothing Happens Here',
+  title: 'Archive - Nothing Happens Here',
 })
 </script>
 

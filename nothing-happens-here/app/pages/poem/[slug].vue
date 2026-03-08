@@ -12,7 +12,7 @@ interface Poem {
 const { data: poem } = await useFetch<Poem>(`/api/poems/${slug}`)
 
 useHead({
-  title: () => poem.value ? `${poem.value.title} — Nothing Happens Here` : 'Not Found',
+  title: () => poem.value ? `${poem.value.title} - Nothing Happens Here` : 'Not Found',
 })
 </script>
 
@@ -23,6 +23,9 @@ useHead({
         <h1 class="font-serif text-[26px] sm:text-[30px] font-medium tracking-tight text-neutral-300 leading-tight">
           {{ poem.title }}
         </h1>
+        <p class="mt-2 font-serif text-sm font-normal text-neutral-300 opacity-50">
+          {{ poem.year }}
+        </p>
         <div class="mt-10 font-serif text-[17px] text-neutral-300 leading-[2] whitespace-pre-wrap">
           {{ poem.content }}
         </div>

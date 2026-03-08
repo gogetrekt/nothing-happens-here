@@ -7,8 +7,8 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Invalid slug' })
   }
 
-  const { blobs } = await list({ prefix: `poems/${slug}.md` })
-  const blob = blobs.find(b => b.pathname === `poems/${slug}.md`)
+  const { blobs } = await list({ prefix: `poems/${slug}.json` })
+  const blob = blobs.find(b => b.pathname === `poems/${slug}.json`)
 
   if (!blob) {
     throw createError({ statusCode: 404, statusMessage: 'Poem not found' })

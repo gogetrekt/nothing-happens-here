@@ -66,7 +66,7 @@ async function handleSave() {
 }
 
 useHead({
-  title: () => poem.value ? `Edit: ${poem.value.title} — Sanctum` : 'Not Found',
+  title: () => poem.value ? `Edit: ${poem.value.title} - Sanctum` : 'Not Found',
 })
 </script>
 

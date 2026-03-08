@@ -54,7 +54,7 @@ async function handleSave() {
 }
 
 useHead({
-  title: 'New Poem — Sanctum',
+  title: 'New Poem - Sanctum',
 })
 </script>
 

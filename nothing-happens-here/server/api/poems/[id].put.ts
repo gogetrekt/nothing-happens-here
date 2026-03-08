@@ -1,5 +1,4 @@
 import { put, list } from '@vercel/blob'
-import { buildMarkdown } from '../../utils/markdown'
 
 export default defineEventHandler(async (event) => {
   const slug = getRouterParam(event, 'id') || ''
@@ -15,17 +14,22 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Title is required' })
   }
 
-  const { blobs } = await list({ prefix: `poems/${slug}.md` })
-  if (!blobs.some(b => b.pathname === `poems/${slug}.md`)) {
+  const { blobs } = await list({ prefix: `poems/${slug}.json` })
+  if (!blobs.some(b => b.pathname === `poems/${slug}.json`)) {
     throw createError({ statusCode: 404, statusMessage: 'Poem not found' })
   }
 
-  const poemYear = Number(year) || new Date().getFullYear()
-  const markdown = buildMarkdown(title.trim(), slug, poemYear, Boolean(draft), content)
+  const poem = {
+    title: title.trim(),
+    slug,
+    year: Number(year) || new Date().getFullYear(),
+    draft: Boolean(draft),
+    content,
+  }
 
-  await put(`poems/${slug}.md`, markdown, {
+  await put(`poems/${slug}.json`, JSON.stringify(poem), {
     access: 'private',
-    contentType: 'text/plain; charset=utf-8',
+    contentType: 'application/json',
     addRandomSuffix: false,
     allowOverwrite: true,
   })

@@ -17,7 +17,7 @@ function handleLogin() {
   }
 }
 
-useHead({ title: 'Login — Nothing Happens Here' })
+useHead({ title: 'Login - Nothing Happens Here' })
 </script>
 
 <template>

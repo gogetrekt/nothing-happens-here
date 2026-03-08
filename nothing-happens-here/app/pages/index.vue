@@ -26,6 +26,9 @@ useHead({
         <h1 class="font-serif text-[30px] sm:text-[36px] lg:text-[42px] font-medium tracking-tight text-neutral-300 leading-tight">
           Nothing Happens Here
         </h1>
+        <p class="mt-2 font-serif text-base font-normal text-neutral-300 opacity-50">
+          a few poems
+        </p>
         <hr class="mt-6 border-t border-neutral-800" />
       </header>
 
