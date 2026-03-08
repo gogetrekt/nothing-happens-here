@@ -48,7 +48,7 @@ useHead({
       <div class="mt-12 space-y-0 divide-y divide-neutral-800/50">
         <section v-for="group in years" :key="group.year" :ref="el => sectionRefs[group.year] = el as HTMLElement | null">
           <button
-            class="w-full flex items-center justify-between py-4 text-sm uppercase tracking-widest text-neutral-500 hover:text-neutral-300 transition-colors duration-150 cursor-pointer"
+            class="flex items-center gap-2 py-4 text-sm uppercase tracking-widest text-neutral-500 hover:text-neutral-300 transition-colors duration-150 cursor-pointer"
             @click="toggle(group.year)"
           >
             <span>{{ group.year }}</span>
