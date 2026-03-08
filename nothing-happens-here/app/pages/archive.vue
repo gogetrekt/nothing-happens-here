@@ -20,14 +20,20 @@ const years = computed(() => {
     .map(([year, poems]) => ({ year: Number(year), poems }))
 })
 
-const openYear = ref<number | null>(null)
+const openYears = ref<Set<number>>(
+  new Set((allPoems.value ?? []).map(p => p.year))
+)
 const sectionRefs = ref<Record<number, HTMLElement | null>>({})
 
 function toggle(year: number) {
-  openYear.value = openYear.value === year ? null : year
-  nextTick(() => {
-    sectionRefs.value[year]?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  })
+  if (openYears.value.has(year)) {
+    openYears.value.delete(year)
+  } else {
+    openYears.value.add(year)
+    nextTick(() => {
+      sectionRefs.value[year]?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
+  }
 }
 
 useHead({
@@ -52,9 +58,9 @@ useHead({
             @click="toggle(group.year)"
           >
             <span>{{ group.year }}</span>
-            <span class="text-xs">{{ openYear === group.year ? '▾' : '▸' }}</span>
+            <span class="text-xs">{{ openYears.has(group.year) ? '▾' : '▸' }}</span>
           </button>
-          <ul v-if="openYear === group.year" class="pb-5 space-y-5">
+          <ul v-if="openYears.has(group.year)" class="pb-5 space-y-5">
             <li v-for="poem in group.poems" :key="poem.slug" class="group">
               <NuxtLink
                 :to="`/poem/${poem.slug}`"
