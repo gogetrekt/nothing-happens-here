@@ -59,7 +59,7 @@ useHead({
           to="/archive"
           class="inline-flex items-center gap-1.5 text-sm uppercase tracking-wide text-neutral-400 hover:text-white transition-colors duration-150"
         >
-          <span>archive</span>
+          <span>archive ({{ poems?.filter(p => !p.draft).length ?? 0 }})</span>
           <span aria-hidden="true">→</span>
         </NuxtLink>
       </nav>

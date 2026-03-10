@@ -17,7 +17,6 @@ const sortedPoems = computed(() =>
   (allPoems.value ?? [])
     .filter(p => !p.draft)
     .slice()
-    .reverse()
 )
 
 const currentIndex = computed(() =>
@@ -51,18 +50,16 @@ useHead({
           {{ poem.content }}
         </div>
 
-        <nav class="mt-14 flex items-center justify-between text-sm uppercase tracking-wide text-neutral-400">
+        <nav class="mt-14 flex items-center gap-8 text-sm uppercase tracking-wide text-neutral-400">
           <NuxtLink v-if="prevPoem" :to="`/poem/${prevPoem.slug}`" class="inline-flex items-center gap-1 hover:text-white transition-colors duration-150">
             <span>←</span><span>previous</span>
           </NuxtLink>
-          <span v-else class="invisible select-none" aria-hidden="true">← previous</span>
 
           <NuxtLink to="/" class="hover:text-white transition-colors duration-150">home</NuxtLink>
 
           <NuxtLink v-if="nextPoem" :to="`/poem/${nextPoem.slug}`" class="inline-flex items-center gap-1 hover:text-white transition-colors duration-150">
             <span>next</span><span>→</span>
           </NuxtLink>
-          <span v-else class="invisible select-none" aria-hidden="true">next →</span>
         </nav>
       </template>
 
