@@ -15,10 +15,10 @@ function handleFooterClick() {
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#0b0b0b]">
+  <div class="bg-[#0b0b0b]">
     <NuxtRouteAnnouncer />
     <NuxtPage />
-    <footer class="w-full pt-16 pb-20">
+    <footer class="w-full pt-6 pb-8">
       <p class="font-serif text-sm text-neutral-600 opacity-60 leading-relaxed text-center tracking-wide" @click="handleFooterClick">left here by r</p>
     </footer>
   </div>

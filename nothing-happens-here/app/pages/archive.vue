@@ -20,6 +20,10 @@ const years = computed(() => {
     .map(([year, poems]) => ({ year: Number(year), poems }))
 })
 
+const totalPoems = computed(() =>
+  (allPoems.value ?? []).filter(p => !p.draft).length
+)
+
 const openYears = ref<Set<number>>(
   new Set((allPoems.value ?? []).map(p => p.year))
 )
@@ -46,7 +50,7 @@ useHead({
     <main class="max-w-2xl mx-auto px-6 pt-20 pb-16">
       <header>
         <h1 class="font-serif text-[26px] sm:text-[30px] lg:text-[34px] font-medium tracking-tight text-neutral-300 leading-tight">
-          Archive
+          Archive ({{ totalPoems }})
         </h1>
         <hr class="mt-6 border-t border-neutral-800" />
       </header>

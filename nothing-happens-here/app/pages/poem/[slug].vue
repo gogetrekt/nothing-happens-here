@@ -6,10 +6,31 @@ interface Poem {
   slug: string
   title: string
   year: number
+  draft: boolean
   content: string
 }
 
 const { data: poem } = await useFetch<Poem>(`/api/poems/${slug}`)
+const { data: allPoems } = await useFetch<Poem[]>('/api/poems')
+
+const sortedPoems = computed(() =>
+  (allPoems.value ?? [])
+    .filter(p => !p.draft)
+    .slice()
+    .reverse()
+)
+
+const currentIndex = computed(() =>
+  sortedPoems.value.findIndex(p => p.slug === slug)
+)
+
+const prevPoem = computed(() =>
+  currentIndex.value > 0 ? sortedPoems.value[currentIndex.value - 1] : null
+)
+
+const nextPoem = computed(() =>
+  currentIndex.value < sortedPoems.value.length - 1 ? sortedPoems.value[currentIndex.value + 1] : null
+)
 
 useHead({
   title: () => poem.value ? `${poem.value.title} - Nothing Happens Here` : 'Not Found',
@@ -30,14 +51,18 @@ useHead({
           {{ poem.content }}
         </div>
 
-        <nav class="mt-14 flex items-center gap-6">
-          <NuxtLink
-            to="/"
-            class="inline-flex items-center gap-1.5 text-sm uppercase tracking-wide text-neutral-400 hover:text-white transition-colors duration-150"
-          >
-            <span>←</span>
-            <span>back</span>
+        <nav class="mt-14 flex items-center justify-between text-sm uppercase tracking-wide text-neutral-400">
+          <NuxtLink v-if="prevPoem" :to="`/poem/${prevPoem.slug}`" class="inline-flex items-center gap-1 hover:text-white transition-colors duration-150">
+            <span>←</span><span>previous</span>
           </NuxtLink>
+          <span v-else class="invisible select-none" aria-hidden="true">← previous</span>
+
+          <NuxtLink to="/" class="hover:text-white transition-colors duration-150">home</NuxtLink>
+
+          <NuxtLink v-if="nextPoem" :to="`/poem/${nextPoem.slug}`" class="inline-flex items-center gap-1 hover:text-white transition-colors duration-150">
+            <span>next</span><span>→</span>
+          </NuxtLink>
+          <span v-else class="invisible select-none" aria-hidden="true">next →</span>
         </nav>
       </template>
 
