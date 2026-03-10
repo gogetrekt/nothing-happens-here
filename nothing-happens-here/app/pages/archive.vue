@@ -50,7 +50,7 @@ useHead({
     <main class="max-w-2xl mx-auto px-6 pt-20 pb-16">
       <header>
         <h1 class="font-serif text-[26px] sm:text-[30px] lg:text-[34px] font-medium tracking-tight text-neutral-300 leading-tight">
-          Archive ({{ totalPoems }})
+          Archive
         </h1>
         <hr class="mt-6 border-t border-neutral-800" />
       </header>
