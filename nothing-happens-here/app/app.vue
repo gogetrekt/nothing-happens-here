@@ -45,10 +45,10 @@ nuxtApp.hook('page:loading:end', stopPageLoading)
 </script>
 
 <template>
-  <div class="bg-[#0b0b0b]">
+  <div class="bg-[#0b0b0b] app-shell" :class="{ 'is-loading': isPageLoading }">
     <NuxtRouteAnnouncer />
     <NuxtLoadingIndicator class="quiet-loading-bar" :height="1.5" :throttle="120" color="linear-gradient(90deg, rgba(229,229,229,0.16), rgba(229,229,229,0.32), rgba(229,229,229,0.16))" />
-    <main class="relative page-shell" :class="{ 'is-loading': isPageLoading }">
+    <main class="relative">
       <NuxtPage />
     </main>
     <footer class="w-full pt-6 pb-8">
