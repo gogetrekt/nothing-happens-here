@@ -78,85 +78,17 @@ input {
   opacity: 0.9;
 }
 
-.page-loading-skeleton {
+.page-shell::after {
+  content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: 10;
-  display: grid;
-  align-content: start;
-  gap: 0.9rem;
-  padding: clamp(2.2rem, 5vw, 4rem) clamp(1.25rem, 6vw, 6rem);
-  background: linear-gradient(
-    to bottom,
-    rgba(11, 11, 11, 0.92) 0%,
-    rgba(11, 11, 11, 0.82) 45%,
-    rgba(11, 11, 11, 0.68) 100%
-  );
-}
-
-.skeleton-line {
-  position: relative;
-  overflow: hidden;
-  border-radius: 999px;
-  height: 0.8rem;
-  background: rgba(229, 229, 229, 0.08);
-  animation: skeleton-pulse 3.8s ease-in-out infinite;
-}
-
-.skeleton-line::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  transform: translateX(-110%);
-  background: linear-gradient(
-    90deg,
-    rgba(229, 229, 229, 0) 0%,
-    rgba(229, 229, 229, 0.1) 48%,
-    rgba(229, 229, 229, 0) 100%
-  );
-  animation: skeleton-shimmer 4.8s ease-in-out infinite;
-}
-
-.skeleton-title {
-  width: min(28rem, 78%);
-  height: 1rem;
-}
-
-.skeleton-paragraph {
-  width: min(22rem, 64%);
-}
-
-.skeleton-paragraph-short {
-  width: min(15rem, 46%);
-}
-
-.soft-fade-enter-active,
-.soft-fade-leave-active {
-  transition: opacity 220ms ease;
-}
-
-.soft-fade-enter-from,
-.soft-fade-leave-to {
   opacity: 0;
+  background: rgba(0, 0, 0, 0.16);
+  transition: opacity 240ms ease;
 }
 
-@keyframes skeleton-shimmer {
-  0%,
-  100% {
-    transform: translateX(-110%);
-  }
-  55% {
-    transform: translateX(110%);
-  }
-}
-
-@keyframes skeleton-pulse {
-  0%,
-  100% {
-    opacity: 0.9;
-  }
-  50% {
-    opacity: 0.72;
-  }
+.page-shell.is-loading::after {
+  opacity: 1;
 }
