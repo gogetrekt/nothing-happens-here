@@ -78,18 +78,28 @@ input {
   opacity: 0.9;
 }
 
-.app-shell::after {
-  content: "";
+.route-dim-overlay {
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 40;
-  opacity: 0;
-  background: rgba(8, 8, 8, 0.11);
+  background: rgba(16, 16, 16, 0.2);
+}
+
+.route-dim-enter-active {
+  transition: opacity 130ms ease;
+}
+
+.route-dim-leave-active {
   transition: opacity 240ms ease;
 }
 
-.app-shell.is-loading::after {
+.route-dim-enter-from,
+.route-dim-leave-to {
+  opacity: 0;
+}
+
+.route-dim-enter-to,
+.route-dim-leave-from {
   opacity: 1;
-  transition-duration: 170ms;
 }

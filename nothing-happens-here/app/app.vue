@@ -1,13 +1,9 @@
 <script setup lang="ts">
 let clickCount = 0
 let resetTimer: ReturnType<typeof setTimeout> | null = null
-let hideLoadingTimer: ReturnType<typeof setTimeout> | null = null
-let loadingStartedAt = 0
 
 const isPageLoading = ref(false)
 const nuxtApp = useNuxtApp()
-
-const MIN_LOADING_VISIBLE_MS = 240
 
 function handleFooterClick() {
   if (resetTimer) clearTimeout(resetTimer)
@@ -21,22 +17,11 @@ function handleFooterClick() {
 }
 
 function startPageLoading() {
-  if (hideLoadingTimer) {
-    clearTimeout(hideLoadingTimer)
-    hideLoadingTimer = null
-  }
-  loadingStartedAt = Date.now()
   isPageLoading.value = true
 }
 
 function stopPageLoading() {
-  const elapsed = Date.now() - loadingStartedAt
-  const remaining = Math.max(0, MIN_LOADING_VISIBLE_MS - elapsed)
-
-  hideLoadingTimer = setTimeout(() => {
-    isPageLoading.value = false
-    hideLoadingTimer = null
-  }, remaining)
+  isPageLoading.value = false
 }
 
 nuxtApp.hook('page:start', startPageLoading)
@@ -45,9 +30,14 @@ nuxtApp.hook('page:loading:end', stopPageLoading)
 </script>
 
 <template>
-  <div class="bg-[#0b0b0b] app-shell" :class="{ 'is-loading': isPageLoading }">
+  <div class="bg-[#0b0b0b] app-shell">
     <NuxtRouteAnnouncer />
     <NuxtLoadingIndicator class="quiet-loading-bar" :height="1.5" :throttle="120" color="linear-gradient(90deg, rgba(229,229,229,0.16), rgba(229,229,229,0.32), rgba(229,229,229,0.16))" />
+
+    <Transition name="route-dim">
+      <div v-if="isPageLoading" class="route-dim-overlay" aria-hidden="true" />
+    </Transition>
+
     <main class="relative">
       <NuxtPage />
     </main>
