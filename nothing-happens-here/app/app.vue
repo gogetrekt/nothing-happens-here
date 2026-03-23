@@ -1,9 +1,12 @@
 <script setup lang="ts">
 let clickCount = 0
 let resetTimer: ReturnType<typeof setTimeout> | null = null
+let hideLoadingTimer: ReturnType<typeof setTimeout> | null = null
+let loadingStartedAt = 0
 
 const isPageLoading = ref(false)
 const nuxtApp = useNuxtApp()
+const MIN_DIM_VISIBLE_MS = 180
 
 function handleFooterClick() {
   if (resetTimer) clearTimeout(resetTimer)
@@ -17,11 +20,22 @@ function handleFooterClick() {
 }
 
 function startPageLoading() {
+  if (hideLoadingTimer) {
+    clearTimeout(hideLoadingTimer)
+    hideLoadingTimer = null
+  }
+  loadingStartedAt = Date.now()
   isPageLoading.value = true
 }
 
 function stopPageLoading() {
-  isPageLoading.value = false
+  const elapsed = Date.now() - loadingStartedAt
+  const remaining = Math.max(0, MIN_DIM_VISIBLE_MS - elapsed)
+
+  hideLoadingTimer = setTimeout(() => {
+    isPageLoading.value = false
+    hideLoadingTimer = null
+  }, remaining)
 }
 
 nuxtApp.hook('page:start', startPageLoading)

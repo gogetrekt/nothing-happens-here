@@ -83,15 +83,15 @@ input {
   inset: 0;
   pointer-events: none;
   z-index: 40;
-  background: rgba(16, 16, 16, 0.2);
+  background: rgba(20, 20, 20, 0.23);
 }
 
 .route-dim-enter-active {
-  transition: opacity 130ms ease;
+  transition: opacity 120ms ease;
 }
 
 .route-dim-leave-active {
-  transition: opacity 240ms ease;
+  transition: opacity 260ms ease;
 }
 
 .route-dim-enter-from,
