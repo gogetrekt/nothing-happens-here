@@ -8,6 +8,7 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
+    blobReadWriteToken: process.env.BLOB_READ_WRITE_TOKEN || '',
   },
 
   css: ['~/assets/css/main.css'],
@@ -25,7 +26,13 @@ export default defineNuxtConfig({
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'description', content: 'A quiet poetry notebook on the internet.' },
+        { name: 'description', content: 'a few poems.' },
+        { property: 'og:title', content: 'Nothing Happens Here' },
+        { property: 'og:description', content: 'a few poems.' },
+        { property: 'og:type', content: 'website' },
+        { name: 'twitter:title', content: 'Nothing Happens Here' },
+        { name: 'twitter:description', content: 'a few poems.' },
+        { name: 'twitter:card', content: 'summary' },
         { name: 'theme-color', content: '#0b0b0b' },
       ],
       link: [

@@ -3,6 +3,15 @@ import { put, list } from '@vercel/blob'
 export default defineEventHandler(async (event) => {
   const slug = getRouterParam(event, 'id') || ''
   const body = await readBody(event)
+  const config = useRuntimeConfig(event)
+  const token = config.blobReadWriteToken
+
+  if (!token) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Storage not configured. Set BLOB_READ_WRITE_TOKEN environment variable.',
+    })
+  }
 
   if (!slug || !/^[a-z0-9-]+$/.test(slug)) {
     throw createError({ statusCode: 400, statusMessage: 'Invalid slug' })
@@ -14,7 +23,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Title is required' })
   }
 
-  const { blobs } = await list({ prefix: `poems/${slug}.json` })
+  const { blobs } = await list({ prefix: `poems/${slug}.json`, token })
   if (!blobs.some(b => b.pathname === `poems/${slug}.json`)) {
     throw createError({ statusCode: 404, statusMessage: 'Poem not found' })
   }
@@ -28,6 +37,7 @@ export default defineEventHandler(async (event) => {
   }
 
   await put(`poems/${slug}.json`, JSON.stringify(poem), {
+    token,
     access: 'private',
     contentType: 'application/json',
     addRandomSuffix: false,
