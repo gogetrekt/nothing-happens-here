@@ -2,7 +2,7 @@
 
 Nothing Happens Here is a minimal, text-focused website that presents a collection of poems and short writings.
 
-The project is built around a single principle: prioritizing the reading experience above everything else. There are no unnecessary features, distractions, or complex interactions—only content.
+The project is built around a single principle: prioritizing the reading experience above everything else. There are no unnecessary features, distractions, or complex interactions, only content.
 
 The interface follows a clean, dark-only design with careful attention to spacing, typography, and structure, allowing the text to remain the central focus.
 
